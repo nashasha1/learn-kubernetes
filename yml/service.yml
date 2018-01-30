@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: test-string-port
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+      name: string-port
+
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: test-string-node-port
+  labels:
+    svc: test-string
+spec:
+  # type: ClusterIP, NodePort, LoadBalancer, ExternalName
+  type: NodePort
+  selector:
+    app: test-string-port
+  ports:
+  - port: 80
+    targetPort: "string-port"
+
+

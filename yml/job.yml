@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: j3
+spec:
+  completions: 6
+  parallelism: 2
+  template:
+    spec:
+      containers:
+      - name: job-c3
+        image: busybox
+        command: ["sh", "-c", "for i in $(seq 1 10  ); do echo $i; sleep 1; done"]
+      restartPolicy: Never
+  backoffLimit: 4

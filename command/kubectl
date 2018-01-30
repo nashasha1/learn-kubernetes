@@ -1,0 +1,2 @@
+kubectl get no 172.20.9.7 -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}'
+kubectl get pods -l app=my-app -o jsonpath='{.items[?(@.status.conditions[?(@.type == "Ready")].status == "True")].status.phase}'

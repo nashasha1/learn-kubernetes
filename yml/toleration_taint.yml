@@ -1,0 +1,16 @@
+# taint nodes $label node-role.kubernetes.io/master=:NoSchedule
+# kubectl nt nodes node1 key1=value1:NoSchedule
+# kubectl taint nodes node1 key1=value1:NoExecute
+# kubectl taint nodes node1 key2=value2:NoSchedule
+# taint nodes $label node-role.kubernetes.io/master-
+
+tolerations:
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoSchedule"
+- key: "key1"
+  operator: "Equal"
+  value: "value1"
+  effect: "NoExecute"
+

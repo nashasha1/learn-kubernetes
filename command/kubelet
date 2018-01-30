@@ -1,0 +1,132 @@
+From: https://github.com/gjmzj/kubeasz/blob/master/docs/06-%E5%AE%89%E8%A3%85kube-node%E8%8A%82%E7%82%B9.md
+
+# kubelet example
+/usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --require-kubeconfig=true --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin --cluster-dns=10.96.0.10 --cluster-domain=cluster.local --authorization-mode=Webhook --client-ca-file=/etc/kubernetes/pki/ca.crt --cgroup-driver=cgroupfs --docker-endpoint=tcp://127.0.0.1:2376 --max-pods=200 --pod-infra-container-image=index.alauda.cn/claas/pause-amd64:3.0 --node-status-update-frequency=4s --feature-gates=Accelerators=true
+
+
+# startup script
+cat `/etc/systemd/system/kubelet.service`
+
+```
+[Unit]
+Description=Kubernetes Kubelet Server
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+After=docker.service
+Wants=docker.socket
+
+[Service]
+EnvironmentFile=-/etc/kubernetes/kubelet.env
+ExecStartPre=-/bin/mkdir -p /var/lib/kubelet/volume-plugins
+ExecStart=/usr/local/bin/kubelet \
+        $KUBE_LOGTOSTDERR \
+        $KUBE_LOG_LEVEL \
+        $KUBELET_API_SERVER \
+        $KUBELET_ADDRESS \
+        $KUBELET_PORT \
+        $KUBELET_HOSTNAME \
+        $KUBE_ALLOW_PRIV \
+        $KUBELET_ARGS \
+        $DOCKER_SOCKET \
+        $KUBELET_NETWORK_PLUGIN \
+        $KUBELET_VOLUME_PLUGIN \
+        $KUBELET_CLOUDPROVIDER
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
+cat `/etc/kubernetes/kubelet.env`
+
+```
+### Upstream source https://github.com/kubernetes/release/blob/master/debian/xenial/kubeadm/channel/stable/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+### All upstream values should be present in this file
+
+# logging to stderr means we get it in the systemd journal
+KUBE_LOGTOSTDERR="--logtostderr=true"
+KUBE_LOG_LEVEL="--v=2"
+# The address for the info server to serve on (set to 0.0.0.0 or "" for all interfaces)
+KUBELET_ADDRESS="--address=0.0.0.0 --node-ip=172.31.47.75"
+# The port for the info server to serve on
+# KUBELET_PORT="--port=10250"
+# You may leave this blank to use the actual hostname
+KUBELET_HOSTNAME="--hostname-override=node1"
+
+
+
+
+KUBELET_ARGS="--bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf \
+--kubeconfig=/etc/kubernetes/kubelet.conf \
+--authorization-mode=Webhook \
+--client-ca-file=/etc/kubernetes/ssl/ca.crt \
+--pod-manifest-path=/etc/kubernetes/manifests \
+--cadvisor-port=0 \
+--pod-infra-container-image=gcr.io/google_containers/pause-amd64:3.0 \
+--kube-reserved cpu=100m,memory=256M \
+--node-status-update-frequency=10s \
+--cgroup-driver=cgroupfs \
+--docker-disable-shared-pid=True \
+--anonymous-auth=false \
+--fail-swap-on=True \
+ --cluster-dns=10.233.0.3 --cluster-domain=cluster.local --resolv-conf=/etc/resolv.conf --kube-reserved cpu=200m,memory=512M "
+KUBELET_NETWORK_PLUGIN="--network-plugin=cni --cni-conf-dir=/etc/cni/net.d --cni-bin-dir=/opt/cni/bin"
+# Should this cluster be allowed to run privileged docker containers
+KUBE_ALLOW_PRIV="--allow-privileged=true"
+KUBELET_CLOUDPROVIDER=""
+
+```
+
+# create kubelet.config
+
+```
+kubectl config set-cluster kubernetes-the-hard-way \
+    --certificate-authority=ca.pem \
+    --embed-certs=true \
+    --server=https://${KUBERNETES_PUBLIC_ADDRESS}:6443 \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config set-credentials system:node:${instance} \
+    --client-certificate=${instance}.pem \
+    --client-key=${instance}-key.pem \
+    --embed-certs=true \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config set-context default \
+    --cluster=kubernetes-the-hard-way \
+    --user=system:node:${instance} \
+    --kubeconfig=${instance}.kubeconfig
+
+  kubectl config use-context default --kubeconfig=${instance}.kubeconfig
+```
+another way
+
+```
+shell: "{{ bin_dir }}/kubectl config set-cluster kubernetes \
+        --certificate-authority={{ ca_dir }}/ca.pem \
+        --embed-certs=true \
+        --server={{ KUBE_APISERVER }} \
+        --kubeconfig=bootstrap.kubeconfig"
+
+shell: "{{ bin_dir }}/kubectl config set-credentials kubelet-bootstrap \
+        --token={{ BOOTSTRAP_TOKEN }} \
+        --kubeconfig=bootstrap.kubeconfig"
+
+shell: "{{ bin_dir }}/kubectl config set-context default \
+        --cluster=kubernetes \
+        --user=kubelet-bootstrap \
+        --kubeconfig=bootstrap.kubeconfig"
+```
+
+# /etc/cni/net.d/
+
+```
+{
+  "name": "cbr0",
+  "type": "flannel",
+  "delegate": {
+    "isDefaultGateway": true
+  }
+}
+```

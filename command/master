@@ -1,0 +1,38 @@
+#apiserver
+```
+kube-apiserver --admission-control=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota --apiserver-count=1 --insecure-port=8080 --service-node-port-range=60000-62000 --requestheader-group-headers=X-Remote-Group --requestheader-allowed-names=front-proxy-client --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --service-account-key-file=/etc/kubernetes/pki/sa.pub --allow-privileged=true --client-ca-file=/etc/kubernetes/pki/ca.crt --secure-port=6443 --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --requestheader-username-headers=X-Remote-User --experimental-bootstrap-token-auth=true --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --requestheader-extra-headers-prefix=X-Remote-Extra- --service-cluster-ip-range=10.96.0.0/12 --tls-private-key-file=/etc/kubernetes/pki/apiserver.key --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --authorization-mode=Node,RBAC --advertise-address=172.31.23.149 --etcd-servers=http://172.31.23.149:2379
+
+```
+
+
+
+other examples
+
+```
+kube-apiserver --insecure-bind-address=127.0.0.1 --runtime-config=admissionregistration.k8s.io/v1alpha1 --storage-backend=etcd3 --apiserver-count=1 --bind-address=0.0.0.0 --insecure-port=8080 --service-node-port-range=30000-32767 --admission-control=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,ValidatingAdmissionWebhook,ResourceQuota --allow-privileged=true --advertise-address=172.31.47.75 --client-ca-file=/etc/kubernetes/ssl/ca.crt --tls-private-key-file=/etc/kubernetes/ssl/apiserver.key --kubelet-client-certificate=/etc/kubernetes/ssl/apiserver-kubelet-client.crt --requestheader-client-ca-file=/etc/kubernetes/ssl/front-proxy-ca.crt --requestheader-allowed-names=front-proxy-client --service-account-key-file=/etc/kubernetes/ssl/sa.pub --secure-port=6443 --proxy-client-key-file=/etc/kubernetes/ssl/front-proxy-client.key --requestheader-username-headers=X-Remote-User --requestheader-extra-headers-prefix=X-Remote-Extra- --tls-cert-file=/etc/kubernetes/ssl/apiserver.crt --proxy-client-cert-file=/etc/kubernetes/ssl/front-proxy-client.crt --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --requestheader-group-headers=X-Remote-Group --kubelet-client-key=/etc/kubernetes/ssl/apiserver-kubelet-client.key --enable-bootstrap-token-auth=true --service-cluster-ip-range=10.233.0.0/18 --authorization-mode=Node,RBAC --etcd-servers=https://172.31.46.76:2379 --etcd-cafile=/etc/kubernetes/ssl/etcd/ca.pem --etcd-certfile=/etc/kubernetes/ssl/etcd/node-node1.pem --etcd-keyfile=/etc/kubernetes/ssl/etcd/node-node1-key.pem
+```
+
+```
+kube-apiserver --admission-control=Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,ResourceQuota --apiserver-count=1 --insecure-port=8080 --service-node-port-range=60000-62000 --requestheader-group-headers=X-Remote-Group --requestheader-extra-headers-prefix=X-Remote-Extra- --service-cluster-ip-range=10.96.0.0/12 --secure-port=6443 --requestheader-client-ca-file=/etc/kubernetes/pki/front-proxy-ca.crt --enable-bootstrap-token-auth=true --requestheader-allowed-names=front-proxy-client --advertise-address=172.20.9.7 --client-ca-file=/etc/kubernetes/pki/ca.crt --kubelet-client-key=/etc/kubernetes/pki/apiserver-kubelet-client.key --requestheader-username-headers=X-Remote-User --tls-cert-file=/etc/kubernetes/pki/apiserver.crt --proxy-client-key-file=/etc/kubernetes/pki/front-proxy-client.key --allow-privileged=true --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname --service-account-key-file=/etc/kubernetes/pki/sa.pub --tls-private-key-file=/etc/kubernetes/pki/apiserver.key --kubelet-client-certificate=/etc/kubernetes/pki/apiserver-kubelet-client.crt --proxy-client-cert-file=/etc/kubernetes/pki/front-proxy-client.crt --authorization-mode=Node,RBAC --etcd-servers=http://172.20.9.7:2379
+
+```
+
+# scheduler
+
+```
+kube-scheduler --address=127.0.0.1 --leader-elect=true --kubeconfig=/etc/kubernetes/scheduler.conf
+```
+
+```
+ kube-scheduler --address=127.0.0.1 --leader-elect=true --kubeconfig=/etc/kubernetes/scheduler.conf
+```
+
+# controller manager
+
+```
+kube-controller-manager --feature-gates=Initializers=False,PersistentLocalVolumes=False --node-monitor-grace-period=40s --node-monitor-period=5s --pod-eviction-timeout=5m0s --cluster-signing-cert-file=/etc/kubernetes/ssl/ca.crt --cluster-signing-key-file=/etc/kubernetes/ssl/ca.key --root-ca-file=/etc/kubernetes/ssl/ca.crt --service-account-private-key-file=/etc/kubernetes/ssl/sa.key --address=127.0.0.1 --leader-elect=true --use-service-account-credentials=true --controllers=*,bootstrapsigner,tokencleaner --kubeconfig=/etc/kubernetes/controller-manager.conf --allocate-node-cidrs=true --cluster-cidr=10.233.64.0/18 --node-cidr-mask-size=24
+```
+
+```
+kube-controller-manager --node-monitor-grace-period=16s --node-monitor-period=2s --pod-eviction-timeout=30s --kubeconfig=/etc/kubernetes/controller-manager.conf --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt --address=127.0.0.1 --use-service-account-credentials=true --controllers=*,bootstrapsigner,tokencleaner --root-ca-file=/etc/kubernetes/pki/ca.crt --service-account-private-key-file=/etc/kubernetes/pki/sa.key --cluster-signing-key-file=/etc/kubernetes/pki/ca.key --leader-elect=true --allocate-node-cidrs=true --cluster-cidr=10.1.0.0/16 --cloud-provider=aws --cloud-config=/etc/kubernetes/cloud-config.conf
+```
