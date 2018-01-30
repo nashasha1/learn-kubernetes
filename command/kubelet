@@ -38,6 +38,23 @@ WantedBy=multi-user.target
 
 ```
 
+
+```
+[Unit]
+Description=kubelet: The Kubernetes Node Agent
+Documentation=http://kubernetes.io/docs/
+
+[Service]
+ExecStart=/usr/bin/kubelet --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests --allow-privileged=true --network-plugin=cni --cluster-dns=10.233.0.3 --cluster-domain=cluster.local --authorization-mode=Webhook --client-ca-file=/etc/kubernetes/ssl/ca.crt --cgroup-driver=cgroupfs --max-pods=200 --feature-gates=Accelerators=true
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
 cat `/etc/kubernetes/kubelet.env`
 
 ```
