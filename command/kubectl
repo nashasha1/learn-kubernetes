@@ -1,2 +1,14 @@
 kubectl get no 172.20.9.7 -o jsonpath='{.status.addresses[?(@.type=="InternalIP")].address}'
 kubectl get pods -l app=my-app -o jsonpath='{.items[?(@.status.conditions[?(@.type == "Ready")].status == "True")].status.phase}'
+
+kubectl get pods -l 'environment in (production),tier in (frontend)'
+kubectl get pods -l 'environment in (production, qa)'
+
+# pod has key: environment and envrionment value notin frontend
+kubectl get pods -l 'environment,environment notin (frontend)'
+
+# success jsonpath
+# list
+kubectl  get no -o jsonpath='{..status.conditions[?(@.type=="Ready")].status}'
+# one element
+kubectl get no node1 -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
