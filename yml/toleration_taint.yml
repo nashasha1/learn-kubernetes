@@ -1,3 +1,4 @@
+https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 # taint nodes $label node-role.kubernetes.io/master=:NoSchedule
 # kubectl nt nodes node1 key1=value1:NoSchedule
 # kubectl taint nodes node1 key1=value1:NoExecute

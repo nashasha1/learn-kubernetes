@@ -12,3 +12,5 @@ kubectl get pods -l 'environment,environment notin (frontend)'
 kubectl  get no -o jsonpath='{..status.conditions[?(@.type=="Ready")].status}'
 # one element
 kubectl get no node1 -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+
+kubectl autoscale deployment nginx-deployment --min=10 --max=15 --cpu-percent=80
